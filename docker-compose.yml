@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mirror-app:
+    build: .
+    container_name: old-tv-mirror
+    ports:
+      - "5000:5000"  # Web interface
+      - "9999:9999"  # Streaming port
+    privileged: true
+    devices:
+      - "/dev/video0:/dev/video0"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+    restart: unless-stopped

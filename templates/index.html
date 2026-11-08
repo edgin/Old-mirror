@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Old TV Mirror - Remote Control</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .camera-feed {
+            width: 100%;
+            max-width: 800px;
+            border: 2px solid #0f0;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #111;
+            border: 1px solid #0f0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #003300;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #006600;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #0f0;
+        }
+        .connected {
+            color: #0f0;
+            background-color: #003300;
+        }
+        .disconnected {
+            color: #f00;
+            background-color: #330000;
+        }
+        h1 {
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Old TV Mirror - Remote Control</h1>
+        
+        <div id="app"></div>
+        
+        <div class="controls">
+            <button onclick="control('prev_effect')">Previous Effect</button>
+            <button onclick="control('next_effect')">Next Effect</button>
+            <button onclick="control('toggle_panel')">Toggle Panel</button>
+            <button onclick="control('reset')">Reset</button>
+        </div>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function control(action) {
+            fetch(`/control/${action}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerHTML = 
+                        `<p>Command "${action}" sent successfully.</p>`;
+                    setTimeout(() => {
+                        document.getElementById('status').innerHTML = '';
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('status').innerHTML = 
+                        `<p>Error sending command "${action}": ${error}</p>`;
+                });
+        }
+    </script>
+</body>
+</html>
