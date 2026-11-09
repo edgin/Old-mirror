@@ -6,7 +6,9 @@ function App() {
   const [panelVisible, setPanelVisible] = useState(false);
   const [currentEffect, setCurrentEffect] = useState('None');
   const [effectParams, setEffectParams] = useState([]);
-  const [serverUrl, setServerUrl] = useState('http://localhost:5000');
+  const [serverUrl, setServerUrl] = useState(
+  () => `${window.location.protocol}//${window.location.hostname}:5000`
+);
 
   useEffect(() => {
     // Get initial status from server

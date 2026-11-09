@@ -54,39 +54,40 @@ def detect_cameras():
         
     return camera_list
 
-def initialize_camera(camera_id=0):
-    """Initialize camera connection with detection"""
+
+REMOTE_CAMERA_URL = "http://100.69.74.51:8765/video_feed"
+
+
+def initialize_camera():
+    """Initialize connection to the remote Windows USB camera."""
     global cap, controller, camera_available
-    
-    # If we haven't detected cameras yet, do so
-    if not camera_list:
-        detect_cameras()
-    
-    # Try to use first available camera or specified one
-    if camera_list:
-        print(f'Using first available camera: {camera_list[0]}')
-        camera_id = camera_list[0]
-    
+
     controller = Controller()
-    
+
     try:
-        cap = controller.get_effect_engine().init_camera(camera_id)
-        if not cap:
-            print("Error: Could not open camera.")
+        print(f"Connecting to remote camera: {REMOTE_CAMERA_URL}")
+
+        cap = controller.get_effect_engine().init_camera(
+            REMOTE_CAMERA_URL
+        )
+
+        if cap is None or not cap.isOpened():
+            print("Error: Could not connect to remote camera.")
             camera_available = False
             return False
-            
-        # Set a reasonable resolution
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        
+
         camera_available = True
-        print(f"Camera successfully initialized at index {camera_id}")
+
+        print("Remote camera successfully initialized!")
         return True
+
     except Exception as e:
-        print(f"Error initializing camera: {e}")
+        print(f"Error initializing remote camera: {e}")
         camera_available = False
         return False
+
+
+
 
 def stream_video():
     """Background thread for video streaming"""
