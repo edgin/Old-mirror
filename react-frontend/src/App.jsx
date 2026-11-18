@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   const [cameraStatus, setCameraStatus] = useState('connecting');
-  const [panelVisible, setPanelVisible] = useState(false);
+  const [panelVisible, setPanelVisible] = useState(true);
   const [currentEffect, setCurrentEffect] = useState('None');
   const [effectParams, setEffectParams] = useState([]);
   const [serverUrl, setServerUrl] = useState(
@@ -80,15 +80,24 @@ function App() {
   return (
     <div className="app">
       <div className="header">
-        <h1>Old TV Mirror Control Panel</h1>
+        
         <div className="status">
           <span className={`status-indicator ${cameraStatus}`}>
             {cameraStatus === 'connected' ? '✓ Camera Connected' : 
              cameraStatus === 'disconnected' ? '✗ No Camera' : 
              '⚠ Error'}
           </span>
-        </div>
-      </div>
+            </div>
+            <div className="parameter-controls">
+              {effectParams.map((param, index) => (
+                <div key={index} className="param-group">
+                  <span>{param.name}</span>
+                  <button onClick={() => handleParamAdjust(index, 'increase')}>↑</button>
+                  <button onClick={() => handleParamAdjust(index, 'decrease')}>↓</button>
+                </div>
+              ))}
+            </div>
+          </div>
 
       <div className="video-container">
         <img 
@@ -102,27 +111,11 @@ function App() {
             <h2>Effect Controls</h2>
             <p>Current Effect: {currentEffect}</p>
             
-            <div className="parameter-controls">
-              {effectParams.map((param, index) => (
-                <div key={index} className="parameter-item">
-                  <label>{param.name}: {param.value.toFixed(2)}</label>
-                  <div className="param-buttons">
-                    <button 
-                      onClick={() => handleParamAdjust(index, 'down')}
-                      className="param-btn"
-                    >
-                      -
-                    </button>
-                    <button 
-                      onClick={() => handleParamAdjust(index, 'up')}
-                      className="param-btn"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="effect-controls">
+          <button onClick={handlePrevEffect} className="control-btn">Previous Effect</button>
+          <button onClick={handleNextEffect} className="control-btn">Next Effect</button>
+          <button onClick={handleReset} className="control-btn">Reset</button>
+        </div>
           </div>
         )}
       </div>

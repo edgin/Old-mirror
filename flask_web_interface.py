@@ -184,6 +184,64 @@ def control_keyboard():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/control/update_param', methods=['POST'])
+def update_param():
+    """Update an effect parameter from the React frontend."""
+    global controller
+
+    if controller is None:
+        return jsonify({"error": "Controller not initialized"}), 400
+
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON body"}), 400
+
+    if 'param_name' not in data or 'value' not in data:
+        return jsonify({"error": "Missing parameter data"}), 400
+
+    param_name = data['param_name']
+    value = data['value']
+
+    if not isinstance(param_name, str):
+        return jsonify({"error": "Parameter name must be a string"}), 400
+
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return jsonify({"error": "Value must be numeric"}), 400
+
+    try:
+        effect_engine = controller.get_effect_engine()
+        params = effect_engine.get_current_params().get("values", [])
+
+        # Find the numeric index expected by EffectEngine
+        param_index = next(
+            (
+                i for i, param in enumerate(params)
+                if param["name"] == param_name
+            ),
+            None
+        )
+
+        if param_index is None:
+            return jsonify({"error": "Unknown parameter"}), 400
+
+        effect_engine.update_parameter(param_index, value)
+
+        # Return the actual value after min/max clamping
+        updated_value = params[param_index]["value"]
+
+        return jsonify({
+            "status": "success",
+            "param_name": param_name,
+            "value": updated_value
+        })
+
+    except (ValueError, TypeError) as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        app.logger.exception("Failed to update effect parameter")
+        return jsonify({"error": "Parameter update failed"}), 500
+
 @app.route('/health')
 def health():
     """Health check endpoint"""
