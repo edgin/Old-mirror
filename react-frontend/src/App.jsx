@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import ControlsPanel  from './components/ControlsPanel.jsx' 
 
 function App() {
   const [cameraStatus, setCameraStatus] = useState('connecting');
   const [panelVisible, setPanelVisible] = useState(true);
   const [currentEffect, setCurrentEffect] = useState('None');
   const [effectParams, setEffectParams] = useState([]);
-  const [serverUrl, setServerUrl] = useState(
-  () => `${window.location.protocol}//${window.location.hostname}:5000`
-);
 
   useEffect(() => {
     // Get initial status from server
-    fetch(`${serverUrl}/health`)
+    fetch('/api/health')
       .then(response => response.json())
       .then(data => {
         setCameraStatus(data.camera_connected ? 'connected' : 'disconnected');
@@ -25,7 +23,7 @@ function App() {
 
     // Fetch current effect info periodically
     const interval = setInterval(() => {
-      fetch(`${serverUrl}/current_effect`)
+      fetch('/api/current_effect')
         .then(response => response.json())
         .then(data => {
           setCurrentEffect(data.current_effect || 'None');
@@ -37,10 +35,10 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [serverUrl]);
+  }, []);
 
   const sendControlCommand = (action) => {
-    fetch(`${serverUrl}/control/${action}`)
+    fetch(`/api/control/${action}`)
       .then(response => response.json())
       .then(data => {
         if (data.status === 'success') {
@@ -59,18 +57,18 @@ function App() {
     setPanelVisible(!panelVisible);
   };
 
-  const handleNextEffect = () => {
-    sendControlCommand('next_effect');
-  };
+  // const handleNextEffect = () => {
+  //   sendControlCommand('next_effect');
+  // };
 
-  const handlePrevEffect = () => {
-    sendControlCommand('prev_effect');
-  };
-
-  const handleReset = () => {
-    sendControlCommand('reset');
-  };
-
+  // const handlePrevEffect = () => {
+  //   sendControlCommand('prev_effect');
+  // };
+  //
+  // const handleReset = () => {
+  //   sendControlCommand('reset');
+  // };
+  //
   const handleParamAdjust = (paramIndex, direction) => {
     // This would normally be implemented on the backend to handle parameter changes
     console.log(`Adjusting param ${paramIndex} ${direction}`);
@@ -79,66 +77,51 @@ function App() {
 
   return (
     <div className="app">
-      <div className="header">
-        
-        <div className="status">
-          <span className={`status-indicator ${cameraStatus}`}>
-            {cameraStatus === 'connected' ? '✓ Camera Connected' : 
-             cameraStatus === 'disconnected' ? '✗ No Camera' : 
-             '⚠ Error'}
-          </span>
-            </div>
-            <div className="parameter-controls">
-              {effectParams.map((param, index) => (
-                <div key={index} className="param-group">
-                  <span>{param.name}</span>
-                  <button onClick={() => handleParamAdjust(index, 'increase')}>↑</button>
-                  <button onClick={() => handleParamAdjust(index, 'decrease')}>↓</button>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* <div className="header"> */}
+      {/**/}
+      {/*   <div className="status"> */}
+      {/*     <span className={`status-indicator ${cameraStatus}`}> */}
+      {/*       {cameraStatus === 'connected' ? '✓ Camera Connected' :  */}
+      {/*        cameraStatus === 'disconnected' ? '✗ No Camera' :  */}
+      {/*        '⚠ Error'} */}
+      {/*     </span> */}
+      {/*       </div> */}
+      {/*       <div className="parameter-controls"> */}
+      {/*         {effectParams.map((param, index) => ( */}
+      {/*           <div key={index} className="param-group"> */}
+      {/*             <span>{param.name}</span> */}
+      {/*             <button onClick={() => handleParamAdjust(index, 'increase')}>↑</button> */}
+      {/*             <button onClick={() => handleParamAdjust(index, 'decrease')}>↓</button> */}
+      {/*           </div> */}
+      {/*         ))} */}
+      {/*       </div> */}
+      {/*     </div> */}
 
       <div className="video-container">
         <img 
-          src={`${serverUrl}/video_feed`} 
-          alt="Camera feed from Old TV Mirror" 
+          src="/video_feed" 
+          alt="Live camera feed" 
           className="video-feed"
         />
         
-        {panelVisible && (
-          <div className="overlay-panel">
-            <h2>Effect Controls</h2>
-            <p>Current Effect: {currentEffect}</p>
-            
-        <div className="effect-controls">
-          <button onClick={handlePrevEffect} className="control-btn">Previous Effect</button>
-          <button onClick={handleNextEffect} className="control-btn">Next Effect</button>
-          <button onClick={handleReset} className="control-btn">Reset</button>
-        </div>
-          </div>
-        )}
+       
       </div>
 
-      <div className="controls">
-        <button onClick={handlePrevEffect} className="control-btn">Previous Effect</button>
-        <button onClick={handleTogglePanel} className={`control-btn ${panelVisible ? 'active' : ''}`}>
-          {panelVisible ? 'Hide Panel' : 'Show Panel'}
-        </button>
-        <button onClick={handleNextEffect} className="control-btn">Next Effect</button>
-        <button onClick={handleReset} className="control-btn">Reset</button>
+      <div>
+      {panelVisible && <ControlsPanel/>}
       </div>
+       <div className="controls"> 
+         {/* <button onClick={handlePrevEffect} className="control-btn">Previous Effect</button>  */}
+         <button onClick={handleTogglePanel} className={`control-btn ${panelVisible ? 'active' : ''}`}>
+          {panelVisible ? 'Hide Panel' : 'Show Panel'} 
+         </button>
+         {/* <button onClick={handleNextEffect} className="control-btn">Next Effect</button> */}
+         {/* <button onClick={handleReset} className="control-btn">Reset</button> */}
+      </div> 
 
-      <div className="server-info">
-        <p>Connected to: {serverUrl}</p>
-        <input 
-          type="text" 
-          value={serverUrl}
-          onChange={(e) => setServerUrl(e.target.value)}
-          placeholder="Enter server URL"
-          className="url-input"
-        />
-      </div>
+      {/* <div className="server-info"> */}
+      {/*   <p>Connected to: http://localhost:5000</p> */}
+      {/* </div> */}
     </div>
   );
 }

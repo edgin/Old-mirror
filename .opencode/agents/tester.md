@@ -1,7 +1,7 @@
 ---
 description: QA engineer who runs tests and verifies application behavior without modifying source code.
-mode: subagent
-model: ollama/qwen2.5-coder:14b
+mode: primary
+model: ollama/qwen3-coder:30b
 permission:
   edit: deny
   bash: ask

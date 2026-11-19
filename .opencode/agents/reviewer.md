@@ -1,7 +1,7 @@
 ---
 description: Independent code reviewer. Finds bugs, regressions, and security issues without modifying files.
-mode: subagent
-model: ollama/qwen2.5-coder:14b
+mode: primary
+model: ollama/qwen3-coder:30b
 permission:
   edit: deny
   bash: ask
